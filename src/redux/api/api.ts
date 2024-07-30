@@ -9,8 +9,8 @@ export const baseApi = createApi({
   endpoints: (builder) => ({
     getMovies: builder.query({
       query: () => ({
-        method: "GET",
         url: "/movies",
+        method: "GET",
       }),
       providesTags: ["movies"],
     }),
@@ -18,8 +18,8 @@ export const baseApi = createApi({
       query: ({ data, slug }) => {
         // console.log(data);
         return {
+          url: `/movies/${slug}/review`,
           method: "POST",
-          url: `movies/${slug}/review`,
           body: data,
         };
       },
@@ -28,9 +28,35 @@ export const baseApi = createApi({
     getSingleMovie: builder.query({
       query: (slug: string) => ({
         // console.log(data);
-        method: "POST",
-        url: `movies/${slug}`,
+        url: `/movies/${slug}`,
+        method: "GET",
       }),
+      providesTags: ["movies"],
+    }),
+    getMovieDetailsAndReviews: builder.query({
+      queryFn: async (slug: string): Promise<any> => {
+        try {
+          const [movieResponse, reviewResponse] = await Promise.all([
+            fetch(`http://localhost:5000/api/movies/${slug}`),
+            fetch(`http://localhost:5000/api/movies/${slug}/reviews`),
+          ]);
+          if (!movieResponse.ok || !reviewResponse.ok) {
+            throw new Error("Something went wrong");
+          }
+          const [movieData, reviewData] = await Promise.all([
+            movieResponse.json(),
+            reviewResponse.json(),
+          ]);
+          return {
+            data: {
+              movie: movieData,
+              reviews: reviewData,
+            },
+          };
+        } catch (err) {
+          return err;
+        }
+      },
     }),
   }),
 });
@@ -39,4 +65,5 @@ export const {
   useGetMoviesQuery,
   useAddRatingMutation,
   useGetSingleMovieQuery,
+  useGetMovieDetailsAndReviewsQuery,
 } = baseApi;
