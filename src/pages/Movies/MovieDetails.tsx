@@ -1,11 +1,21 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 
 import { Button } from "@/components/ui/button";
+import { useGetSingleMovieQuery } from "@/redux/api/api";
 import { Play, Plus, Star, StarIcon } from "lucide-react";
 import { useParams } from "react-router-dom";
 
 export default function MovieDetails() {
   const { id: slug } = useParams();
+  const { data, isLoading } = useGetSingleMovieQuery(slug as string);
+
+  const { data: movie } = data.movies;
+
+  console.log(data)
+
+  if (isLoading) {
+    return <div>Loading .....</div>
+  }
 
   const renderStars = (rating: number) => {
     const stars = [];
@@ -30,10 +40,10 @@ export default function MovieDetails() {
   };
 
   // celculate average rating max 10
-  const totalRating = reviews.reduce((acc: number, review: any) => {
-    return acc + review.rating;
-  }, 0);
-  const averageRating = totalRating / reviews.length;
+  // const totalRating = reviews.reduce((acc: number, review: any) => {
+  //   return acc + review.rating;
+  // }, 0);
+  // const averageRating = totalRating / reviews.length;
   return (
     <div className="flex flex-col items-center p-4 bg-gray-900 text-white min-h-screen">
       <div className="max-w-6xl w-full bg-gray-800 rounded-lg shadow-lg p-6 animate__animated animate__fadeIn">

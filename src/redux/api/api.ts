@@ -25,7 +25,18 @@ export const baseApi = createApi({
       },
       invalidatesTags: ["movies"],
     }),
+    getSingleMovie: builder.query({
+      query: (slug: string) => ({
+        // console.log(data);
+        method: "POST",
+        url: `movies/${slug}`,
+      }),
+    }),
   }),
 });
 
-export const { useGetMoviesQuery, useAddRatingMutation } = baseApi;
+export const {
+  useGetMoviesQuery,
+  useAddRatingMutation,
+  useGetSingleMovieQuery,
+} = baseApi;
